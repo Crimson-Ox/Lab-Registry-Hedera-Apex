@@ -137,3 +137,13 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+ 
+ # --- BLOCKCHAIN SHIELD ---
+out/
+cache/
+broadcast/
+lib/
+artifacts/
+*.pem
+private.key
+.env
