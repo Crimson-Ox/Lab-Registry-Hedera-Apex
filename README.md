@@ -3,7 +3,7 @@ Decentralized Verifiable Diagnostics on Hedera: Anchoring AI-driven medical anal
    
 
 
-   # 🏥 Lab Registry (Hedera Apex Bounty)
+   # 🏥 Smart Lab Registry (Hedera Apex Bounty)
 **Track:** AI & Agents | **Role:** Junior Auditor (Solidity Lead)
 
 ## 🎯 Product Clarity: The Vision
