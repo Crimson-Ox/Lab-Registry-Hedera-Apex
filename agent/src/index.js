@@ -4,6 +4,7 @@ const {
   Client,
   ContractExecuteTransaction,
   ContractFunctionParameters,
+  PrivateKey,
 } = require("@hashgraph/sdk");
 
 const path = require("path");
@@ -21,7 +22,9 @@ function createClientFromEnv() {
   const client =
     network === "mainnet" ? Client.forMainnet() : Client.forTestnet();
 
-  return client.setOperator(operatorId, operatorKey);
+  const privateKey = PrivateKey.fromStringECDSA(operatorKey);
+
+  return client.setOperator(operatorId, privateKey);
 }
 
 async function anchorReport({
