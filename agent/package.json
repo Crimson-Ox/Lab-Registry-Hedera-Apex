@@ -1,0 +1,14 @@
+{
+  "name": "lab-registry-agent",
+  "version": "0.1.0",
+  "description": "Hedera SDK-based agent that listens for lab results and anchors summaries into the LabRegistry contract.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/runner.js",
+    "dev": "node src/runner.js"
+  },
+  "dependencies": {
+    "@hashgraph/sdk": "^2.53.0",
+    "dotenv": "^16.4.5"
+  }
+}
