@@ -42,7 +42,7 @@ A critical audit fix introduced in V5.0 is the `require(labReports[_id].timestam
 ### Critical Logic Functions
 
 * **`addReport`**: The primary entry point. It requires `msg.value` to be $\ge$ `anchorFee`. It checks for the `LAB_DIRECTOR_ROLE` first; if the caller isn't the human boss, it forces the AI Agent to prove its identity via the HTS Badge and Whitelist status.
-* **`getReport`**: The Privacy Shield. This function utilizes a "Caller Check" to ensure that sensitive microbiology results are only visible to the Lab Director or the specific Patient (`patientAddress`) associated with the report.
+* **`getReport`**: The Privacy Shield. This function utilizes a "Caller Check" to ensure that sensitive Lab results are only visible to the Lab Director or the specific Patient (`patientAddress`) associated with the report.
 
 ---
 
@@ -90,14 +90,6 @@ V5.0 represents the pinnacle of our team work. we successfully navigated the tra
 * **Agent Whitelisted.**
 * **Fee set to 0** (for maximum stability during the demo).
 
-
-
-You should place the **V5.0 Gas Audit Sheet** in a dedicated file within your `blockchain` folder. This keeps your technical evidence organized and professional for the judges.
-
-You are absolutely right to catch that. In V5.0, because we added **three layers of security** (Sovereign RBAC, HTS Token Gating, and the Overwrite Shield), the gas cost naturally increased compared to the primitive V1/V2 versions.
-
-Your on-chain data shows the actual cost is **137,902 gas**. This is the "Security Tax"—the cost of making the lab medically secure.
-
 ---
 
 ### 🏛️ Updated V5.0 Gas Consumption Report (Audit-Verified)
@@ -117,19 +109,19 @@ Your on-chain data shows the actual cost is **137,902 gas**. This is the "Securi
 
 ### 🔍 Technical Breakdown of the V5.0 "Security Tax"
 
-Why did it jump from 12k to 137k? For a judge, this is how you explain that **higher gas = higher safety**:
+Why did it jump from 12k to 137k?  this is how  **higher gas = higher safety**:
 
 1. **The HTS Gate (External Call):** Every time the AI Agent calls `addReport`, the contract makes an external call to the **Hedera Token Service** to check for the Badge Token. External calls are the most expensive operations in the EVM.
 2. **AccessControl (RBAC):** The contract now checks the `authorizedAgents` mapping AND the `LAB_DIRECTOR_ROLE`. Checking multiple state slots increases gas but prevents unauthorized anchoring.
 3. **The Integrity Guard:** Before saving, the contract reads the mapping to ensure the `timestamp` is zero. This "Read-before-Write" is essential to prevent overwriting results, costing an extra ~2,100 gas for the SLOAD operation.
-4. **Indexed Events:** Your logs show `topic` and `args` are fully indexed. Indexing data for the Mirror Node (so Uzumaki's n8n can "see" it) adds a small gas cost but is required for the Agentic Workflow.
+4. **Indexed Events:** the  logs show `topic` and `args` are fully indexed. Indexing data for the Mirror Node  adds a small gas cost but is required for the Agentic Workflow.
 
 ---
 
 ###  🏛️ V5.0 Final Audit: The Security vs. Efficiency Report
 
 ### 📊 On-Chain Verification (Tx: 0x264b56...)
-The final production version of the Lab Registry prioritizing **Medical Integrity** over raw gas minimization.
+The final production version of the Lab Registry priotizing **Medical Integrity** over raw gas minimization.
 
 * **Final Execution Cost:** 137,902 Gas
 * **Status:** Verified Successful (Status 1)

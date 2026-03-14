@@ -4,9 +4,9 @@
 
 **Goal:** Transition the "Smart Lab Registry" from a centralized "Owner" model to a decentralized, multi-tiered **Sovereign RBAC** system.
 
-* **The Problem Statement:** In V3, the contract relied on a single `owner` address. If that key was lost or compromised, the entire lab infrastructure in Dutse would be bricked. Furthermore, a single owner couldn't distinguish between high-level administrative tasks (like pausing the contract) and operational tasks (like whitelisting technicians).
+* **The Problem Statement:** In V3, the contract relied on a single `owner` address. If that key was lost or compromised, the entire lab infrastructure  would be bricked. Furthermore, a single owner couldn't distinguish between high-level administrative tasks (like pausing the contract) and operational tasks (like whitelisting technicians).
 * **The Technical Breakthrough:** We integrated OpenZeppelin’s `AccessControl.sol`. This allowed us to define roles using `bytes32` constants, which are more gas-efficient than strings.
-* **The Conflict (Nested Permissions):** During testing on your **Lenovo X240**, we realized that `DEFAULT_ADMIN_ROLE` was too broad. We needed a system where the **Factory Admin (Account 1)** could "fire" the **Director (Account 2)** without the Director being able to fire the Admin.
+* **The Conflict (Nested Permissions):** During testing  we realized that `DEFAULT_ADMIN_ROLE` was too broad. We needed a system where the **Factory Admin (Account 1)** could "fire" the **Director (Account 2)** without the Director being able to fire the Admin.
 * **Audit Logic:** We implemented `_setRoleAdmin(LAB_DIRECTOR_ROLE, FACTORY_ADMIN_ROLE)`. This established the "Sovereign Hierarchy."
 * **Outcome:** A pristine separation of powers where Account 1 manages the infrastructure and Account 2 manages the lab operations.
 
@@ -58,7 +58,7 @@ struct LabReport {
 
 
 * **Testing Logic:** This was the first time we used the testing identifiers **"Jane"** and **"Blood"**.
-* **The Storage Discovery:** By auditing the storage slots, we verified that the `timestamp` (using `block.timestamp`) provided a tamper-proof "Anchor Time" that the technician could not forge. This is vital for microbiology results that are time-sensitive.
+* **The Storage Discovery:** By auditing the storage slots, we verified that the `timestamp` (using `block.timestamp`) provided a tamper-proof "Anchor Time" that the technician could not forge. This is vital for Laboratory results that are time-sensitive.
 * **Privacy Layer:** We moved the mapping to `private` to ensure that data could only be accessed via the authorized `getReport` getter.
 
 ---
@@ -88,7 +88,7 @@ struct LabReport {
 
 **Goal:** Achieve a working HTS Token Gate using **ERC20-Parity**.
 
-* **The Breakthrough:** We stopped fighting the precompiles. We translated your Token ID `0.0.8138959` into its EVM address: `0x00000000000000000000000000000000007c30cf`.
+* **The Breakthrough:** We stopped fighting the precompiles. We translated the Token ID `0.0.8138959` into its EVM address: `0x00000000000000000000000000000000007c30cf`.
 * **The Success Anchor:** * **Test Account:** Account 4 (AI Agent).
 * **Test Data:** Report **333**, "Blood", "Jane".
 
