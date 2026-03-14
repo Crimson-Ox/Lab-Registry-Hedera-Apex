@@ -55,7 +55,7 @@ export const AIDiagnostics: React.FC = () => {
       ai_summary: result.aiSummary,
       ipfs_cid: ipfsCID,
       tx_id: tx,
-      status: result.hedera.status,
+      status: "PENDING", // Always start as PENDING after initial anchor
     });
 
     return { aiSummary: result.aiSummary, tx, ipfsCID };

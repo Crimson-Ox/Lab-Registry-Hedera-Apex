@@ -87,7 +87,7 @@ export const Layout: React.FC<LayoutProps> = ({
             Sign out
           </button>
           <small style={{ display: "block", marginTop: "0.75rem" }}>
-            Hedera Apex 2026 · Contract 0.0.5366433
+            Hedera Apex 2026 · Contract {import.meta.env.VITE_LAB_REGISTRY_CONTRACT_ID || "0.0.8221212"}
           </small>
         </footer>
       </aside>
