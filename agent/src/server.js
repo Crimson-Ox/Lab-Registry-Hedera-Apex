@@ -6,6 +6,7 @@ const crypto = require("crypto");
 
 const { summarizeLabResult, chatWithLabContext } = require("./llm");
 const { anchorReport } = require("./index");
+const { pinDiagnosticToIPFS } = require("./ipfs");
 
 const app = express();
 
@@ -48,12 +49,25 @@ app.post("/api/execute-report", async (req, res) => {
       resultValue,
     });
 
+    // --- NEW: IPFS STORAGE LAYER ---
+    const ipfsData = {
+      id,
+      patientAddress,
+      hashedPatientId,
+      testName,
+      resultValue,
+      aiSummary,
+      timestamp: new Date().toISOString()
+    };
+    
+    const ipfsCID = await pinDiagnosticToIPFS(ipfsData);
+
     const agentName =
       process.env.LAB_REGISTRY_AGENT_NAME || "Uzumaki-AI-Agent";
 
     const hederaResult = await anchorReport({
       id,
-      resultSummary: aiSummary,
+      resultSummary: ipfsCID, // We anchor the CID, not the summary!
       technicianName: agentName,
       patientEvmAddress: patientAddress,
     });
@@ -65,6 +79,7 @@ app.post("/api/execute-report", async (req, res) => {
       testName,
       resultValue,
       aiSummary,
+      ipfsCID,
       hedera: hederaResult,
     });
   } catch (err) {

@@ -61,6 +61,7 @@ export interface LabAuditRow {
   test_name: string | null;
   result_value: string | null;
   ai_summary: string | null;
+  ipfs_cid: string | null;
   tx_id: string | null;
   status: string | null;
   created_at: string;

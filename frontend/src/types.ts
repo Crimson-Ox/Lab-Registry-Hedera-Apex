@@ -15,6 +15,7 @@ export interface AgentExecutionResult {
   testName: string;
   resultValue: string | number;
   aiSummary: string;
+  ipfsCID?: string;
   hedera: {
     status: string;
     transactionId: string;

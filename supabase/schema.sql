@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS lab_audit (
   test_name     text,
   result_value  text,
   ai_summary    text,
+  ipfs_cid      text,
   tx_id         text,
   status        text,
   created_at    timestamptz DEFAULT now()

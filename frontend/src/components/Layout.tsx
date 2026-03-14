@@ -42,12 +42,16 @@ export const Layout: React.FC<LayoutProps> = ({
           >
             Dashboard
           </button>
-          <button
-            className={current === "ai-diagnostics" ? "nav-btn active" : "nav-btn"}
-            onClick={() => onChange("ai-diagnostics")}
-          >
-            AI Diagnostics
-          </button>
+          
+          {user.role === "admin" && (
+            <button
+              className={current === "ai-diagnostics" ? "nav-btn active" : "nav-btn"}
+              onClick={() => onChange("ai-diagnostics")}
+            >
+              AI Diagnostics
+            </button>
+          )}
+
           <button
             className={current === "audit" ? "nav-btn active" : "nav-btn"}
             onClick={() => onChange("audit")}

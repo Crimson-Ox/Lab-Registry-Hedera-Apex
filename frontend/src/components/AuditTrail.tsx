@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { fetchLabAudit, hederaTxUrl, type LabAuditRow } from "../api";
+import type { User } from "./Login";
 
-export const AuditTrail: React.FC = () => {
+interface AuditTrailProps {
+  user: User;
+}
+
+export const AuditTrail: React.FC<AuditTrailProps> = ({ user }) => {
   const [rows, setRows] = useState<LabAuditRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +74,9 @@ export const AuditTrail: React.FC = () => {
                     }}
                   >
                     <td>{r.report_id ?? "—"}</td>
-                    <td style={{ fontWeight: 500, color: "#0f172a" }}>{r.patient_name || "(Anonymous)"}</td>
+                    <td style={{ fontWeight: 500, color: "var(--text-main)" }}>
+                      {user.role === "admin" ? (r.patient_name || "(Anonymous)") : "(Hidden for Privacy)"}
+                    </td>
                     <td>{r.test_name ?? "—"}</td>
                     <td>{r.result_value ?? "—"}</td>
                     <td>
@@ -118,28 +125,47 @@ export const AuditTrail: React.FC = () => {
               </div>
 
               <dl style={{ display: "flex", flexDirection: "column", gap: "1rem", margin: 0 }}>
+                {user.role === "admin" && (
+                  <div>
+                    <dt style={{ color: "var(--text-sub)", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Off-Chain Name (Admin Only)</dt>
+                    <dd style={{ margin: 0, fontWeight: 500, color: "var(--text-main)" }}>{selected.patient_name || "(Anonymous)"}</dd>
+                  </div>
+                )}
                 <div>
-                  <dt style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Off-Chain Name (Admin Only)</dt>
-                  <dd style={{ margin: 0, fontWeight: 500, color: "#0f172a" }}>{selected.patient_name || "(Anonymous)"}</dd>
-                </div>
-                <div>
-                  <dt style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Diagnostic Summary</dt>
-                  <dd style={{ margin: 0, background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.95rem", lineHeight: 1.5 }}>
+                  <dt style={{ color: "var(--text-sub)", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Diagnostic Summary</dt>
+                  <dd style={{ margin: 0, background: "var(--nav-hover)", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.95rem", lineHeight: 1.5 }}>
                     {selected.ai_summary ?? "—"}
                   </dd>
                 </div>
+                {user.role === "admin" && (
+                  <div>
+                    <dt style={{ color: "var(--text-sub)", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Patient EVM Address</dt>
+                    <dd className="mono small" style={{ margin: 0, wordBreak: "break-all" }}>
+                      {selected.patient_evm ?? "—"}
+                    </dd>
+                  </div>
+                )}
                 <div>
-                  <dt style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Patient EVM Address</dt>
-                  <dd className="mono small" style={{ margin: 0, wordBreak: "break-all" }}>
-                    {selected.patient_evm ?? "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Hedera Anchor Tx</dt>
+                  <dt style={{ color: "var(--text-sub)", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>Hedera Anchor Tx</dt>
                   <dd className="mono small" style={{ margin: 0, wordBreak: "break-all" }}>
                     {selected.tx_id ?? "—"}
                   </dd>
                 </div>
+                {selected.ipfs_cid && (
+                  <div>
+                    <dt style={{ color: "var(--text-sub)", fontSize: "0.8rem", marginBottom: "0.2rem", fontWeight: 600, textTransform: "uppercase" }}>IPFS Storage (CID)</dt>
+                    <dd className="mono small" style={{ margin: 0, wordBreak: "break-all" }}>
+                      <a 
+                        href={`https://gateway.pinata.cloud/ipfs/${selected.ipfs_cid}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ color: "var(--blue-main)", textDecoration: "none" }}
+                      >
+                        {selected.ipfs_cid} ↗
+                      </a>
+                    </dd>
+                  </div>
+                )}
                 {selected.tx_id && hederaTxUrl(selected.tx_id) && (
                   <div style={{ marginTop: "0.5rem" }}>
                     <a
