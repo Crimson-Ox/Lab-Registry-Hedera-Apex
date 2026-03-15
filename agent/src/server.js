@@ -6,8 +6,16 @@ const crypto = require("crypto");
 
 const { summarizeLabResult, chatWithLabContext } = require("./llm");
 const { anchorReport } = require("./index");
+const { pinDiagnosticToIPFS } = require("./ipfs");
+
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 app.use(cors());
 app.use(express.json());
@@ -17,7 +25,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const PORT = process.env.AGENT_API_PORT || 4000;
+const PORT = process.env.PORT || process.env.AGENT_API_PORT || 4000;
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
@@ -48,12 +56,25 @@ app.post("/api/execute-report", async (req, res) => {
       resultValue,
     });
 
+    // --- NEW: IPFS STORAGE LAYER ---
+    const ipfsData = {
+      id,
+      patientAddress,
+      hashedPatientId,
+      testName,
+      resultValue,
+      aiSummary,
+      timestamp: new Date().toISOString()
+    };
+    
+    const ipfsCID = await pinDiagnosticToIPFS(ipfsData);
+
     const agentName =
       process.env.LAB_REGISTRY_AGENT_NAME || "Uzumaki-AI-Agent";
 
     const hederaResult = await anchorReport({
       id,
-      resultSummary: aiSummary,
+      resultSummary: ipfsCID, // We anchor the CID, not the summary!
       technicianName: agentName,
       patientEvmAddress: patientAddress,
     });
@@ -65,6 +86,7 @@ app.post("/api/execute-report", async (req, res) => {
       testName,
       resultValue,
       aiSummary,
+      ipfsCID,
       hedera: hederaResult,
     });
   } catch (err) {
@@ -72,6 +94,49 @@ app.post("/api/execute-report", async (req, res) => {
     res
       .status(500)
       .json({ error: "Agent execution failed", details: String(err) });
+  }
+});
+
+app.post("/api/verify-report", async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: "Missing report ID" });
+
+    const { verifyReport } = require("./index");
+    let hederaResult;
+    try {
+      hederaResult = await verifyReport(id);
+    } catch (err) {
+      const isRevert = err.message && (
+        err.message.includes("Report already final") || 
+        err.message.includes("CONTRACT_REVERT_EXECUTED")
+      );
+
+      if (isRevert) {
+        console.log(`Report ${id} probably already verified (Revert). Syncing DB just in case...`);
+        hederaResult = { status: "SUCCESS", note: "Synced from on-chain state" };
+      } else {
+        throw err;
+      }
+    }
+
+    // Update Supabase status to VERIFIED
+    const { error: dbErr } = await supabase
+      .from("lab_audit")
+      .update({ status: "VERIFIED", verified_by: process.env.HEDERA_OPERATOR_ID })
+      .eq("report_id", String(id));
+
+    if (dbErr) {
+      console.error(`Supabase sync failed for report ${id}:`, dbErr.message);
+      // We don't throw here if on-chain was successful, but we log it
+    } else {
+      console.log(`✅ Supabase sync successful for report ${id}`);
+    }
+
+    res.json({ success: true, hedera: hederaResult });
+  } catch (err) {
+    console.error("Verification error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

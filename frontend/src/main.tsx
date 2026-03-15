@@ -31,8 +31,8 @@ const App: React.FC = () => {
 
   let content: React.ReactNode = null;
   if (nav === "dashboard") content = <Dashboard />;
-  else if (nav === "ai-diagnostics") content = <AIDiagnostics />;
-  else if (nav === "audit") content = <AuditTrail />;
+  else if (nav === "ai-diagnostics" && user.role === "admin") content = <AIDiagnostics />;
+  else if (nav === "audit") content = <AuditTrail user={user} />;
   else if (nav === "chat") content = <ChatAgent />;
   else content = <Landing />;
 

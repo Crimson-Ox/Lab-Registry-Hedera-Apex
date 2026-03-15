@@ -72,6 +72,7 @@
 
 * {
   box-sizing: border-box;
+  overflow-wrap: break-word; /* Ensure long hashes don't break layout */
 }
 
 body {
@@ -439,6 +440,7 @@ input:focus, textarea:focus {
   font-size: 0.875rem;
   color: var(--text-main);
   word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .table {
@@ -453,6 +455,19 @@ input:focus, textarea:focus {
   padding: 0.875rem 1rem;
   border-bottom: 1px solid var(--border-color);
   text-align: left;
+}
+
+.table tr:hover {
+  background: var(--nav-hover);
+}
+
+.table tr.selected {
+  background: var(--btn-primary) !important;
+}
+
+.table tr.selected td,
+.table tr.selected td * {
+  color: #ffffff !important;
 }
 
 .table th {
