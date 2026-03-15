@@ -34,11 +34,14 @@ CREATE TABLE IF NOT EXISTS lab_audit (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   report_id    text,
   patient_evm  text,
+  patient_name text,
   test_name    text,
   result_value text,
   ai_summary   text,
+  ipfs_cid     text,
   tx_id        text,
   status       text,
+  verified_by  text,
   created_at   timestamptz DEFAULT now()
 );
 
@@ -46,8 +49,10 @@ ALTER TABLE lab_audit ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "lab_audit anon read" ON lab_audit;
 DROP POLICY IF EXISTS "lab_audit anon insert" ON lab_audit;
+DROP POLICY IF EXISTS "lab_audit anon update" ON lab_audit;
 CREATE POLICY "lab_audit anon read" ON lab_audit FOR SELECT TO anon USING (true);
 CREATE POLICY "lab_audit anon insert" ON lab_audit FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "lab_audit anon update" ON lab_audit FOR UPDATE TO anon USING (true) WITH CHECK (true);
 
 INSERT INTO app_users (email, password_hash, role) VALUES
   ('demo@lab.local', extensions.crypt('Demo123!', extensions.gen_salt('bf')), 'admin'),

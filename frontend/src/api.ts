@@ -10,7 +10,7 @@ const MIRROR_NODE_URL =
 
 const LAB_REGISTRY_CONTRACT_ID =
   (import.meta.env.VITE_LAB_REGISTRY_CONTRACT_ID as string | undefined) ||
-  "0.0.5366433";
+  "0.0.8221212";
 
 export async function executeAgent(
   payload: LabReportInput
@@ -61,8 +61,10 @@ export interface LabAuditRow {
   test_name: string | null;
   result_value: string | null;
   ai_summary: string | null;
+  ipfs_cid: string | null;
   tx_id: string | null;
   status: string | null;
+  verified_by: string | null;
   created_at: string;
 }
 
@@ -105,4 +107,15 @@ export async function insertLabAudit(row: Partial<LabAuditRow>) {
   const { error } = await supabase.from("lab_audit").insert(row);
   if (error) throw new Error(error.message);
 }
-
+export async function verifyOnChainReport(id: number) {
+  const response = await fetch(`${AGENT_API_URL}/api/verify-report`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to verify report");
+  }
+  return response.json();
+}

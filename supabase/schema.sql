@@ -44,13 +44,16 @@ CREATE TABLE IF NOT EXISTS lab_audit (
   test_name     text,
   result_value  text,
   ai_summary    text,
+  ipfs_cid      text,
   tx_id         text,
   status        text,
+  verified_by   text,
   created_at    timestamptz DEFAULT now()
 );
 
 ALTER TABLE lab_audit ENABLE ROW LEVEL SECURITY;
 
--- Allow anon to read/insert lab_audit for demo (tighten later)
+-- Allow anon to read/insert/update lab_audit for demo (tighten later)
 CREATE POLICY "lab_audit anon read" ON lab_audit FOR SELECT TO anon USING (true);
 CREATE POLICY "lab_audit anon insert" ON lab_audit FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "lab_audit anon update" ON lab_audit FOR UPDATE TO anon USING (true) WITH CHECK (true);

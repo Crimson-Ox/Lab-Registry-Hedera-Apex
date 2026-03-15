@@ -44,19 +44,21 @@ export const AIDiagnostics: React.FC = () => {
     pushToast(`Processing report ${data.id}...`, "info");
     const result = await executeAgent(data);
     const tx = result.hedera.transactionId ?? null;
+    const ipfsCID = result.ipfsCID ?? null;
     
     await insertLabAudit({
       report_id: String(data.id),
       patient_evm: data.patientAddress,
-      patient_name: data.patientName, // We send actual name to DB
+      patient_name: data.patientName,
       test_name: data.testName,
       result_value: String(data.resultValue),
       ai_summary: result.aiSummary,
+      ipfs_cid: ipfsCID,
       tx_id: tx,
-      status: result.hedera.status,
+      status: "PENDING", // Always start as PENDING after initial anchor
     });
 
-    return { aiSummary: result.aiSummary, tx };
+    return { aiSummary: result.aiSummary, tx, ipfsCID };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
