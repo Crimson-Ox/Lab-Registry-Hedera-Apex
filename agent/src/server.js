@@ -140,6 +140,35 @@ app.post("/api/verify-report", async (req, res) => {
   }
 });
 
+app.post("/api/reject-report", async (req, res) => {
+  try {
+    const { id, reason } = req.body;
+    if (!id || !reason) return res.status(400).json({ error: "Missing report ID or reason" });
+
+    const { rejectReport } = require("./index");
+    const hederaResult = await rejectReport(id, reason);
+
+    // Update Supabase status to REJECTED
+    const { error: dbErr } = await supabase
+      .from("lab_audit")
+      .update({ 
+        status: "REJECTED", 
+        verified_by: process.env.HEDERA_OPERATOR_ID,
+        rejection_reason: reason -- Note: Ensure this column is added if not there, or use a field
+      })
+      .eq("report_id", String(id));
+
+    if (dbErr) {
+      console.error(`Supabase sync failed for rejection of report ${id}:`, dbErr.message);
+    }
+
+    res.json({ success: true, hedera: hederaResult });
+  } catch (err) {
+    console.error("Rejection error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post("/api/chat", async (req, res) => {
   const { query, labContext } = req.body || {};
   if (!query || typeof query !== "string") {

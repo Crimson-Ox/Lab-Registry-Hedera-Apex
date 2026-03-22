@@ -106,5 +106,29 @@ async function getReportState(id) {
   return result;
 }
 
-module.exports = { anchorReport, verifyReport, getReportState };
+async function rejectReport(id, reason) {
+  const client = createClientFromEnv();
+  const contractId = process.env.LAB_REGISTRY_CONTRACT_ID;
+  if (!contractId) throw new Error("LAB_REGISTRY_CONTRACT_ID must be set");
+
+  const tx = await new ContractExecuteTransaction()
+    .setContractId(contractId)
+    .setGas(250000)
+    .setFunction(
+      "rejectReport",
+      new ContractFunctionParameters().addUint256(id).addString(reason)
+    )
+    .freezeWith(client);
+
+  const signTx = await tx.signWithOperator(client);
+  const response = await signTx.execute(client);
+  const receipt = await response.getReceipt(client);
+
+  return {
+    status: receipt.status.toString(),
+    transactionId: response.transactionId.toString(),
+  };
+}
+
+module.exports = { anchorReport, verifyReport, rejectReport, getReportState };
 

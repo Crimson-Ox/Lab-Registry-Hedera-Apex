@@ -119,3 +119,16 @@ export async function verifyOnChainReport(id: number) {
   }
   return response.json();
 }
+
+export async function rejectOnChainReport(id: number, reason: string) {
+  const response = await fetch(`${AGENT_API_URL}/api/reject-report`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, reason }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to reject report");
+  }
+  return response.json();
+}
