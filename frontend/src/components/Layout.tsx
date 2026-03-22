@@ -75,7 +75,17 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {/* 4. DIRECTOR ONLY: Governance & Treasury & Stats */}
+          {/* 4. PATIENT & DIRECTOR: Stats */}
+          {['patient', 'director', 'admin'].includes(role) && (
+            <button
+              className={current === "dashboard" ? "nav-btn active" : "nav-btn"}
+              onClick={() => onChange("dashboard")}
+            >
+              Health Dashboard
+            </button>
+          )}
+
+          {/* 5. DIRECTOR ONLY: Governance & Treasury */}
           {['director', 'admin'].includes(role) && (
             <>
               <button
@@ -89,12 +99,6 @@ export const Layout: React.FC<LayoutProps> = ({
                 onClick={() => onChange("treasury")}
               >
                 Hospital Treasury
-              </button>
-              <button
-                className={current === "dashboard" ? "nav-btn active" : "nav-btn"}
-                onClick={() => onChange("dashboard")}
-              >
-                Dashboard Overview
               </button>
             </>
           )}

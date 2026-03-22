@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { fetchLabAudit, hederaTxUrl, type LabAuditRow } from "../api";
+import { getStoredUser } from "./Login";
 
 export const Dashboard: React.FC = () => {
   const [recentReports, setRecentReports] = useState<LabAuditRow[]>([]);
+  const user = getStoredUser();
+  const isPatient = user?.role === "patient";
 
   const refreshRecent = () => {
     fetchLabAudit().then(setRecentReports).catch(() => {});
@@ -14,33 +17,35 @@ export const Dashboard: React.FC = () => {
   const totalReports = recentReports.length;
   const uniqueTests = new Set(recentReports.map(r => r.test_name)).size;
   const successRate = totalReports > 0 
-    ? Math.round((recentReports.filter(r => (r.status || "").toLowerCase().includes("success") || r.status === "AUTHENTICATED").length / totalReports) * 100) 
+    ? Math.round((recentReports.filter(r => (r.status || "").toLowerCase().includes("success") || r.status === "AUTHENTICATED" || r.status === "VERIFIED").length / totalReports) * 100) 
     : 0;
 
   return (
     <div className="page">
       <header className="page-header">
-        <h1>Dashboard Overview</h1>
+        <h1>{isPatient ? "My Health Insights" : "Hospital Dashboard"}</h1>
         <p className="sub">
-          High-level statistics and recent activity across the decentralized lab network.
+          {isPatient 
+            ? "Your medical history verified across the Hedera trust network." 
+            : "High-level statistics and recent activity across the decentralized lab network."}
         </p>
       </header>
 
       <div className="grid-three" style={{ marginBottom: "2rem" }}>
         <div className="stat-card">
-          <span className="stat-label">Total Anchored Reports</span>
+          <span className="stat-label">{isPatient ? "Total Records" : "Anchored Reports"}</span>
           <span className="stat-value">{totalReports}</span>
-          <span className="stat-sub">Across all connected agents</span>
+          <span className="stat-sub">{isPatient ? "Found in your vault" : "Across all connected agents"}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-label">Unique Diagnostic Tests</span>
+          <span className="stat-label">Unique Tests</span>
           <span className="stat-value">{uniqueTests}</span>
-          <span className="stat-sub">Tracked on-chain parameters</span>
+          <span className="stat-sub">{isPatient ? "Types of diagnostics run" : "Tracked on-chain parameters"}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-label">Consensus Success Rate</span>
+          <span className="stat-label">Trust Index</span>
           <span className="stat-value">{successRate}%</span>
-          <span className="stat-sub">Valid HTS-gated transactions</span>
+          <span className="stat-sub">{isPatient ? "Verified by Officers" : "Consensus Success Rate"}</span>
         </div>
       </div>
 

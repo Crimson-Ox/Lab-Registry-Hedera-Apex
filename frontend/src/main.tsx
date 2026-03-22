@@ -35,7 +35,7 @@ const App: React.FC = () => {
   let content: React.ReactNode = null;
   const role = user.role;
 
-  if (nav === "dashboard" && ['director', 'admin'].includes(role)) {
+  if (nav === "dashboard" && ['patient', 'director', 'admin'].includes(role)) {
     content = <Dashboard />;
   } else if (nav === "ai-diagnostics" && ['technician', 'medical_officer', 'director', 'admin'].includes(role)) {
     content = <AIDiagnostics />;
