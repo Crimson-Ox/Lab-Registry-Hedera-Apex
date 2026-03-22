@@ -171,184 +171,182 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-wrap">
-      <div className="login-card">
-        <h1>Smart Lab Registry</h1>
-        <p className="sub">{isSignup ? "Create your account" : "Sign in to access the dashboard"}</p>
-        
+    <div className="login-page">
+      <div className="card login-card">
+        <header className="login-header">
+          <h1>Smart Lab Registry</h1>
+          <p className="sub">Sign in to access your secure medical vault.</p>
+        </header>
+
         {isSignup ? (
           <form onSubmit={handleSignUp}>
-            <select value={role} onChange={(e) => setRole(e.target.value as UserRole)} style={{ marginBottom: '1rem' }}>
-              <option value="patient">Patient</option>
-              <option value="technician">Technician</option>
-              <option value="medical_officer">Medical Officer</option>
-              <option value="director">Director</option>
-            </select>
+            <div className="input-group">
+              <select value={role} onChange={(e) => setRole(e.target.value as UserRole)} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <option value="patient">Register as Patient (Web2)</option>
+                <option value="technician">Register as Staff (Technician)</option>
+                <option value="medical_officer">Register as Staff (Officer)</option>
+                <option value="director">Register as Staff (Director)</option>
+              </select>
+            </div>
 
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
-
-            {role === 'patient' ? (
-              <>
+            {role === "patient" ? (
+              <div className="input-group" style={{ marginTop: '15px' }}>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '12px' }}
+                />
                 <input
                   type="text"
                   placeholder="Phone Number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
+                  style={{ width: '100%', padding: '12px', marginTop: '10px' }}
                 />
                 <input
-                  type="text"
+                  type="password"
                   placeholder="Hospital PIN (6 digits)"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   required
+                  style={{ width: '100%', padding: '12px', marginTop: '10px' }}
                 />
-              </>
+              </div>
             ) : (
-              <input
-                type="email"
-                placeholder="Work Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div className="input-group" style={{ marginTop: '15px' }}>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '12px' }}
+                />
+                <input
+                  type="email"
+                  placeholder="Work Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '12px', marginTop: '10px' }}
+                />
+              </div>
             )}
 
-            <input
-              type="password"
-              placeholder="Set Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="input-group" style={{ position: 'relative', marginTop: '15px' }}>
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  fontSize: '1.2rem',
+                  zIndex: 10,
+                  opacity: 0.7,
+                  userSelect: 'none'
+                }}
+              >
+                {showPassword ? "👁️" : "👁️‍🗨️"}
+              </span>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Set Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{ paddingLeft: '45px', width: '100%', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px' }}
+              />
+            </div>
 
-            {error && <p className="error" style={{ marginBottom: "0.75rem" }}>{error}</p>}
-            
-            <button type="submit" disabled={loading}>
+            {error && <p className="error" style={{ margin: '15px 0', color: 'red', textAlign: 'center' }}>{error}</p>}
+
+            <button className="btn btn-primary" type="submit" disabled={loading} style={{ width: '100%', padding: '12px', marginTop: '15px' }}>
               {loading ? "Creating Account…" : "Register"}
             </button>
-            <button type="button" className="text-btn" onClick={() => setIsSignup(false)} style={{ marginTop: '1rem' }}>
+            <button className="btn btn-outline" type="button" onClick={() => setIsSignup(false)} style={{ width: '100%', padding: '12px', marginTop: '12px' }}>
               Back to Sign In
             </button>
           </form>
         ) : (
           <form onSubmit={handleSubmit}>
-            <select 
-              value={role} 
-              onChange={(e) => setRole(e.target.value as UserRole)} 
-              style={{ marginBottom: '1rem', width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}
-            >
-              <option value="patient">Login as Patient</option>
-              <option value="technician">Login as Staff (Technician)</option>
-              <option value="medical_officer">Login as Staff (Officer)</option>
-              <option value="director">Login as Staff (Director)</option>
-              <option value="admin">Login as Admin (Legacy)</option>
-            </select>
+            <div className="input-group">
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as UserRole)}
+                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}
+              >
+                <option value="patient">Login as Patient (Web2)</option>
+                <option value="technician">Login as Staff (Technician)</option>
+                <option value="medical_officer">Login as Staff (Officer)</option>
+                <option value="director">Login as Staff (Director)</option>
+                <option value="admin">Login as Admin (Legacy)</option>
+              </select>
+            </div>
 
-            {role === 'patient' ? (
-              <>
-                <input
-                  type="text"
-                  placeholder="Phone Number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Hospital PIN"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  required
-                />
-              </>
-            <>
-                <div className="input-group">
-                  <select value={role} onChange={(e) => setRole(e.target.value as any)}>
-                    <option value="patient">Login as Patient (Web2)</option>
-                    <option value="technician">Login as Staff (Technician)</option>
-                    <option value="medical_officer">Login as Staff (Officer)</option>
-                    <option value="director">Login as Staff (Director)</option>
-                    <option value="admin">Login as Admin (Legacy)</option>
-                  </select>
-                </div>
+            <div className="input-group" style={{ marginTop: '15px' }}>
+              <input
+                type="text"
+                placeholder={role === "patient" ? "Phone Number" : "Email"}
+                value={role === "patient" ? phone : email}
+                onChange={(e) => role === "patient" ? setPhone(e.target.value) : setEmail(e.target.value)}
+                required
+                style={{ width: '100%', padding: '12px' }}
+              />
+            </div>
 
-                <div className="input-group">
-                  <input
-                    type="text"
-                    placeholder={role === "patient" ? "Phone Number" : "Email"}
-                    value={role === "patient" ? phone : email}
-                    onChange={(e) => role === "patient" ? setPhone(e.target.value) : setEmail(e.target.value)}
-                    required
-                  />
-                </div>
+            <div className="input-group" style={{ position: 'relative', marginTop: '15px' }}>
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  fontSize: '1.2rem',
+                  zIndex: 10,
+                  opacity: 0.7,
+                  userSelect: 'none'
+                }}
+              >
+                {showPassword ? "👁️" : "👁️‍🗨️"}
+              </span>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder={role === "patient" ? "Hospital PIN" : "Password"}
+                value={role === "patient" ? pin : password}
+                onChange={(e) => role === "patient" ? setPin(e.target.value) : setPassword(e.target.value)}
+                required
+                style={{ paddingLeft: '45px', width: '100%', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px' }}
+              />
+            </div>
 
-                <div className="input-group" style={{ position: 'relative' }}>
-                  <span 
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{ 
-                      position: 'absolute', 
-                      left: '12px', 
-                      top: '50%', 
-                      transform: 'translateY(-50%)',
-                      cursor: 'pointer',
-                      fontSize: '1.2rem',
-                      zIndex: 10,
-                      userSelect: 'none',
-                      opacity: 0.7
-                    }}
-                  >
-                    {showPassword ? "👁️" : "👁️‍🗨️"}
-                  </span>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder={role === "patient" ? "Hospital PIN" : "Password"}
-                    value={role === "patient" ? pin : password}
-                    onChange={(e) => role === "patient" ? setPin(e.target.value) : setPassword(e.target.value)}
-                    required
-                    style={{ paddingLeft: '45px', width: '100%' }}
-                  />
-                </div>
+            {error && <p className="error" style={{ margin: '15px 0', color: 'red', textAlign: 'center' }}>{error}</p>}
 
-                {error && (
-                  <p className="error" style={{ marginBottom: "0.75rem" }}>
-                    {error}
-                  </p>
-                )}
+            <button className="btn btn-primary" type="submit" disabled={loading} style={{ width: '100%', padding: '12px', marginTop: '15px' }}>
+              {loading ? "Authenticating..." : "Sign In"}
+            </button>
 
-                <button 
-                  className="btn btn-primary" 
-                  type="submit" 
-                  disabled={loading}
-                  style={{ width: '100%', padding: '12px', marginTop: '10px' }}
-                >
-                  {loading ? "Authenticating..." : "Sign In"}
-                </button>
-
-                <button 
-                  className="btn btn-outline" 
-                  type="button"
-                  onClick={() => setIsSignup(true)}
-                  style={{ width: '100%', padding: '12px', marginTop: '12px' }}
-                >
-                  Don't have an account? Sign Up
-                </button>
-              </>
+            <button className="btn btn-outline" type="button" onClick={() => setIsSignup(true)} style={{ width: '100%', padding: '12px', marginTop: '12px' }}>
+              Don't have an account? Sign Up
+            </button>
           </form>
         )}
-        
+
         {!isSignup && (
-          <p className="sub" style={{ marginTop: "1rem", fontSize: "0.75rem" }}>
-            Demo: demo@lab.local / Demo123! &nbsp;|&nbsp; user@lab.local / User123!
-          </p>
+          <div style={{ marginTop: '2rem', fontSize: '0.85rem', color: '#666', textAlign: 'center', background: '#f8f9fa', padding: '10px', borderRadius: '8px' }}>
+            <p style={{ marginBottom: '5px' }}>🔑 <strong>Staff Pass:</strong> demo@lab.local / 123456</p>
+            <p>📱 <strong>Patient A:</strong> 1234567890 / 123456</p>
+          </div>
         )}
       </div>
     </div>
   );
 };
+```
