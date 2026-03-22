@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { supabase } from "../supabaseClient";
 
-export type UserRole = "admin" | "user";
+export type UserRole = "patient" | "technician" | "medical_officer" | "director" | "admin";
 
 export interface User {
   email: string;
   role: UserRole;
+  full_name?: string;
 }
 
 const AUTH_KEY = "lab-registry-auth";
@@ -57,6 +58,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
     setLoading(true);
     try {
+      // V5.1 Signup Logic (as per blueprint)
+      // Note: This logic is for the SIGN UP page, while this component is currently LOGIN.
+      // I will update the login RPC call to handle the new roles.
       const { data, error: rpcError } = await supabase.rpc("auth_app_user", {
         p_email: email.trim(),
         p_password: password,
@@ -72,7 +76,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       }
       const user: User = {
         email: row.email,
-        role: (row.role === "admin" ? "admin" : "user") as UserRole,
+        role: row.role as UserRole,
       };
       setStoredUser(user);
       onLogin(user);
@@ -83,36 +87,171 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
+  const [isSignup, setIsSignup] = useState(false);
+  const [role, setRole] = useState<UserRole>("patient");
+  const [phone, setPhone] = useState("");
+  const [pin, setPin] = useState("");
+  const [fullName, setFullName] = useState("");
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      // --- STEP 1: THE GATEKEEPER CHECK ---
+      if (role === 'patient') {
+        const { data: preReg, error: preRegError } = await supabase!
+          .from('hospital_pre_reg').select('*')
+          .eq('phone', phone).eq('default_pin', pin).single();
+
+        if (preRegError || !preReg) {
+          setError("❌ Invalid PIN. Check your Hospital Card.");
+          setLoading(false);
+          return;
+        }
+      } 
+      else {
+        // Staff validation requires an authorized_staff_emails table
+        const { data: staffAuth, error: staffError } = await supabase!
+          .from('authorized_staff_emails').select('*')
+          .eq('email', email.trim()).eq('role', role).single();
+
+        if (staffError || !staffAuth) {
+          setError("❌ Unauthorized Email. Contact Admin.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // --- STEP 2: ACCOUNT CREATION ---
+      const { error: authError } = await supabase!.auth.signUp({
+        email: email.trim() || `${phone}@hospital.com`, // Email for staff, fake email for phone patients
+        password: password,
+        options: {
+          data: { role: role, full_name: fullName }
+        }
+      });
+
+      if (authError) {
+        setError(`❌ Signup Failed: ${authError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      // --- STEP 3: ACTIVATE PATIENT ---
+      if (role === 'patient') {
+        await supabase!.from('hospital_pre_reg').update({ is_activated: true }).eq('phone', phone);
+      }
+
+      alert("🎉 Account Created! You can now Sign In.");
+      setIsSignup(false);
+    } catch (err: any) {
+      setError(err.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-wrap">
       <div className="login-card">
         <h1>Smart Lab Registry</h1>
-        <p className="sub">Sign in to access the dashboard</p>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && (
-            <p className="error" style={{ marginBottom: "0.75rem" }}>
-              {error}
-            </p>
-          )}
-          <button type="submit" disabled={loading}>
-            {loading ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
-        <p className="sub" style={{ marginTop: "1rem", fontSize: "0.75rem" }}>
-          Demo: demo@lab.local / Demo123! &nbsp;|&nbsp; user@lab.local / User123!
-        </p>
+        <p className="sub">{isSignup ? "Create your account" : "Sign in to access the dashboard"}</p>
+        
+        {isSignup ? (
+          <form onSubmit={handleSignUp}>
+            <select value={role} onChange={(e) => setRole(e.target.value as UserRole)} style={{ marginBottom: '1rem' }}>
+              <option value="patient">Patient</option>
+              <option value="technician">Technician</option>
+              <option value="medical_officer">Medical Officer</option>
+              <option value="director">Director</option>
+            </select>
+
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+            />
+
+            {role === 'patient' ? (
+              <>
+                <input
+                  type="text"
+                  placeholder="Phone Number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Hospital PIN (6 digits)"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  required
+                />
+              </>
+            ) : (
+              <input
+                type="email"
+                placeholder="Work Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            )}
+
+            <input
+              type="password"
+              placeholder="Set Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            {error && <p className="error" style={{ marginBottom: "0.75rem" }}>{error}</p>}
+            
+            <button type="submit" disabled={loading}>
+              {loading ? "Creating Account…" : "Register"}
+            </button>
+            <button type="button" className="text-btn" onClick={() => setIsSignup(false)} style={{ marginTop: '1rem' }}>
+              Back to Sign In
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {error && (
+              <p className="error" style={{ marginBottom: "0.75rem" }}>
+                {error}
+              </p>
+            )}
+            <button type="submit" disabled={loading}>
+              {loading ? "Signing in…" : "Sign in"}
+            </button>
+            <button type="button" className="text-btn" onClick={() => setIsSignup(true)} style={{ marginTop: '1rem' }}>
+              Don't have an account? Sign Up
+            </button>
+          </form>
+        )}
+        
+        {!isSignup && (
+          <p className="sub" style={{ marginTop: "1rem", fontSize: "0.75rem" }}>
+            Demo: demo@lab.local / Demo123! &nbsp;|&nbsp; user@lab.local / User123!
+          </p>
+        )}
       </div>
     </div>
   );
