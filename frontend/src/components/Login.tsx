@@ -268,57 +268,78 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   required
                 />
               </>
-            ) : (
-              <>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <div style={{ position: 'relative' }}>
-                  <button 
-                    type="button"
+            <>
+                <div className="input-group">
+                  <select value={role} onChange={(e) => setRole(e.target.value as any)}>
+                    <option value="patient">Login as Patient (Web2)</option>
+                    <option value="technician">Login as Staff (Technician)</option>
+                    <option value="medical_officer">Login as Staff (Officer)</option>
+                    <option value="director">Login as Staff (Director)</option>
+                    <option value="admin">Login as Admin (Legacy)</option>
+                  </select>
+                </div>
+
+                <div className="input-group">
+                  <input
+                    type="text"
+                    placeholder={role === "patient" ? "Phone Number" : "Email"}
+                    value={role === "patient" ? phone : email}
+                    onChange={(e) => role === "patient" ? setPhone(e.target.value) : setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="input-group" style={{ position: 'relative' }}>
+                  <span 
                     onClick={() => setShowPassword(!showPassword)}
                     style={{ 
                       position: 'absolute', 
-                      left: '10px', 
+                      left: '12px', 
                       top: '50%', 
                       transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
                       cursor: 'pointer',
                       fontSize: '1.2rem',
-                      zIndex: 10
+                      zIndex: 10,
+                      userSelect: 'none',
+                      opacity: 0.7
                     }}
                   >
                     {showPassword ? "👁️" : "👁️‍🗨️"}
-                  </button>
+                  </span>
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={role === "patient" ? "Hospital PIN" : "Password"}
+                    value={role === "patient" ? pin : password}
+                    onChange={(e) => role === "patient" ? setPin(e.target.value) : setPassword(e.target.value)}
                     required
-                    style={{ paddingLeft: '40px' }}
+                    style={{ paddingLeft: '45px', width: '100%' }}
                   />
                 </div>
-              </>
-            )}
 
-            {error && (
-              <p className="error" style={{ marginBottom: "0.75rem" }}>
-                {error}
-              </p>
-            )}
-            
-            <button type="submit" disabled={loading}>
-              {loading ? "Signing in…" : "Sign in"}
-            </button>
-            <button type="button" className="text-btn" onClick={() => setIsSignup(true)} style={{ marginTop: '1rem' }}>
-              Don't have an account? Sign Up
-            </button>
+                {error && (
+                  <p className="error" style={{ marginBottom: "0.75rem" }}>
+                    {error}
+                  </p>
+                )}
+
+                <button 
+                  className="btn btn-primary" 
+                  type="submit" 
+                  disabled={loading}
+                  style={{ width: '100%', padding: '12px', marginTop: '10px' }}
+                >
+                  {loading ? "Authenticating..." : "Sign In"}
+                </button>
+
+                <button 
+                  className="btn btn-outline" 
+                  type="button"
+                  onClick={() => setIsSignup(true)}
+                  style={{ width: '100%', padding: '12px', marginTop: '12px' }}
+                >
+                  Don't have an account? Sign Up
+                </button>
+              </>
           </form>
         )}
         
