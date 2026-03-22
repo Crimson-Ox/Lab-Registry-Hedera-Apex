@@ -90,25 +90,35 @@ export const VerifyQueue: React.FC = () => {
                   <td>{r.report_id}</td>
                   <td>{r.patient_name} <br/><small className="sub">{r.patient_evm}</small></td>
                   <td>{r.test_name}</td>
-                  <td><strong>{r.result_value}</strong></td>
+                  <td><span style={{ filter: 'blur(4px)', userSelect: 'none' }}>HIDDEN</span></td>
                   <td>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button 
-                        className="primary-btn" 
-                        onClick={() => handleVerify(r.report_id!)}
-                        style={{ background: '#10b981', padding: '0.5rem 0.75rem' }}
-                      >
-                        Verify
-                      </button>
-                      <button 
-                        className="secondary-btn" 
-                        onClick={() => handleRejectClick(r.report_id!)}
-                        style={{ color: '#ef4444', borderColor: '#fecaca', padding: '0.5rem 0.75rem' }}
-                      >
-                        Veto
-                      </button>
-                    </div>
-                  </td>
+  <div style={{ display: 'flex', gap: '0.5rem' }}>
+    {/* NEW REVIEW BUTTON */}
+    <button 
+      className="secondary-btn" 
+      onClick={() => alert(`CLINICAL DATA REVIEW\nPatient: ${r.patient_name}\nTest: ${r.test_name}\nRESULT: ${r.result_value}`)}
+      style={{ padding: '0.5rem 0.75rem', borderColor: '#3b82f6', color: '#3b82f6' }}
+    >
+      Review
+    </button>
+
+    <button 
+      className="primary-btn" 
+      onClick={() => handleVerify(r.report_id!)}
+      style={{ background: '#10b981', padding: '0.5rem 0.75rem' }}
+    >
+      Verify
+    </button>
+
+    <button 
+      className="secondary-btn" 
+      onClick={() => handleRejectClick(r.report_id!)}
+      style={{ color: '#ef4444', borderColor: '#fecaca', padding: '0.5rem 0.75rem' }}
+    >
+      Veto
+    </button>
+  </div>
+</td>
                 </tr>
               ))}
             </tbody>

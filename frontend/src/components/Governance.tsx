@@ -20,9 +20,9 @@ export const Governance: React.FC = () => {
     // Note: We need a transfer_requests table or use a status in lab_audit.
     // Based on the contract, there's a mapping. In Supabase, we'll look for status 'TRANSFER_PENDING'
     const { data, error } = await supabase
-      .from("lab_audit")
-      .select("id, report_id, patient_name, status")
-      .eq("status", "TRANSFER_PENDING");
+  .from("lab_audit")
+  .select("id, report_id, patient_name, status, rejection_reason") // THE REASON FIELD
+  .eq("status", "TRANSFER_PENDING");
     
     if (!error) setRequests(data as any);
     setLoading(false);
