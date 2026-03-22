@@ -169,6 +169,51 @@ app.post("/api/reject-report", async (req, res) => {
   }
 });
 
+app.post("/api/handle-transfer", async (req, res) => {
+  try {
+    const { id, approve, note } = req.body;
+    if (!id || typeof approve !== 'boolean') return res.status(400).json({ error: "Missing transfer info" });
+
+    const { handleTransferRequest } = require("./index");
+    const hederaResult = await handleTransferRequest(id, approve, note || "");
+    res.json({ success: true, hedera: hederaResult });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/set-automation", async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { setAutomation } = require("./index");
+    const hederaResult = await setAutomation(status);
+    res.json({ success: true, hedera: hederaResult });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/set-fee", async (req, res) => {
+  try {
+    const { fee } = req.body;
+    const { setAnchorFee } = require("./index");
+    const hederaResult = await setAnchorFee(fee);
+    res.json({ success: true, hedera: hederaResult });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/treasury-stats", async (req, res) => {
+  try {
+    const { getTreasuryStats } = require("./index");
+    const stats = await getTreasuryStats();
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post("/api/chat", async (req, res) => {
   const { query, labContext } = req.body || {};
   if (!query || typeof query !== "string") {

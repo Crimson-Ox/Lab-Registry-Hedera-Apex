@@ -130,5 +130,63 @@ async function rejectReport(id, reason) {
   };
 }
 
-module.exports = { anchorReport, verifyReport, rejectReport, getReportState };
+async function handleTransferRequest(id, approve, note) {
+  const client = createClientFromEnv();
+  const contractId = process.env.LAB_REGISTRY_CONTRACT_ID;
+  const tx = await new ContractExecuteTransaction()
+    .setContractId(contractId)
+    .setGas(250000)
+    .setFunction("handleTransferRequest", new ContractFunctionParameters().addUint256(id).addBool(approve).addString(note))
+    .freezeWith(client);
+  const signTx = await tx.signWithOperator(client);
+  const response = await signTx.execute(client);
+  const receipt = await response.getReceipt(client);
+  return { status: receipt.status.toString(), txId: response.transactionId.toString() };
+}
+
+async function setAutomation(status) {
+  const client = createClientFromEnv();
+  const contractId = process.env.LAB_REGISTRY_CONTRACT_ID;
+  const tx = await new ContractExecuteTransaction()
+    .setContractId(contractId)
+    .setGas(100000)
+    .setFunction("setAutomation", new ContractFunctionParameters().addBool(status))
+    .freezeWith(client);
+  const signTx = await tx.signWithOperator(client);
+  const response = await signTx.execute(client);
+  return { status: "SUCCESS" };
+}
+
+async function setAnchorFee(fee) {
+  const client = createClientFromEnv();
+  const contractId = process.env.LAB_REGISTRY_CONTRACT_ID;
+  const tx = await new ContractExecuteTransaction()
+    .setContractId(contractId)
+    .setGas(100000)
+    .setFunction("setAnchorFee", new ContractFunctionParameters().addUint256(fee))
+    .freezeWith(client);
+  const signTx = await tx.signWithOperator(client);
+  const response = await signTx.execute(client);
+  return { status: "SUCCESS" };
+}
+
+async function getTreasuryStats() {
+  const client = createClientFromEnv();
+  const contractId = process.env.LAB_REGISTRY_CONTRACT_ID;
+  // Note: For balance, we use AccountBalanceQuery on the contract ID
+  const { AccountBalanceQuery } = require("@hashgraph/sdk");
+  const balance = await new AccountBalanceQuery().setContractId(contractId).execute(client);
+  
+  // We'd also need to call the contract for automationEnabled and anchorFee if they are public
+  // For now, simplicity:
+  return { 
+    balanceHbar: balance.hbars.toString(),
+    contractId: contractId
+  };
+}
+
+module.exports = { 
+  anchorReport, verifyReport, rejectReport, getReportState,
+  handleTransferRequest, setAutomation, setAnchorFee, getTreasuryStats
+};
 

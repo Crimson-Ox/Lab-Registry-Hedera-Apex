@@ -132,3 +132,39 @@ export async function rejectOnChainReport(id: number, reason: string) {
   }
   return response.json();
 }
+
+export async function handleTransferRequest(id: number, approve: boolean, note: string) {
+  const response = await fetch(`${AGENT_API_URL}/api/handle-transfer`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, approve, note }),
+  });
+  if (!response.ok) throw new Error("Failed to handle transfer");
+  return response.json();
+}
+
+export async function setAutomationStatus(status: boolean) {
+  const response = await fetch(`${AGENT_API_URL}/api/set-automation`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) throw new Error("Failed to set automation status");
+  return response.json();
+}
+
+export async function setAnchorFee(fee: number) {
+  const response = await fetch(`${AGENT_API_URL}/api/set-fee`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fee }),
+  });
+  if (!response.ok) throw new Error("Failed to set anchor fee");
+  return response.json();
+}
+
+export async function fetchTreasuryStats() {
+  const response = await fetch(`${AGENT_API_URL}/api/treasury-stats`);
+  if (!response.ok) throw new Error("Failed to fetch treasury stats");
+  return response.json();
+}
