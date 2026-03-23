@@ -14,7 +14,7 @@
 > **Important**
 > * **Project URL:**  [https://lab-registry-hedera-apex.vercel.app/]
 > * **Technical Demo Video:** [https://youtube.com/shorts/9_uPsDuFV3M?si=ANWSXGcblrA0ZXwD]
-> * **Storage Layer:**  [https://gateway.pinata.cloud/ipfs/QmUcDCGUekftBm2kteawYwaQGB1dCadwSAgsDcFVKWGLDG]
+> * **Storage Layer:**  [https://gateway.pinata.cloud/ipfs/QmRKKzAX6UZUA54i8rQ9Y1fSdoUCSVVTaUntkjCd1mqbVV]
 > *Note:* Due to high-intensity background noise cancellation during the final edit, some audio clipping occurred. Please refer to the timestamps below for the core architectural breakthroughs:
  – AI-Agent data entry layer (Reducing Web3 friction).
  – Human-in-the-loop: Medical Officer Veto/Verify logic.
