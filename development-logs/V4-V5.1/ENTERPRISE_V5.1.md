@@ -5,7 +5,7 @@
 **Live Contract ID:** `0.0.8321102`  
 **Network:** Hedera Testnet (EVM)  
 **Status:** ✅ **V5.1  ACTIVE**
-*Legacy Contract ID :* *V5.0*
+*Legacy Contract :* *V5.0*
 ---
 
 ## 1. THE WEB3 FRICTION GAP: The "Invisible" Ledger
